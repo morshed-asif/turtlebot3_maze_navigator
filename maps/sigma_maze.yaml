@@ -1,4 +1,4 @@
-image: /home/asif/turtlebot3_maze_navigator/maps/sigma_maze.pgm
+image: sigma_maze.pgm
 mode: trinary
 resolution: 0.05
 origin: [-4.03, -1, 0]
