@@ -1,69 +1,210 @@
-📝 Project Overview
+# TurtleBot3 Maze Navigator
 
-This repository contains a ROS 2 Humble workspace for simulating a TurtleBot3 Waffle navigating through a custom hexagonal "Sigma Maze." The project includes environment design, SLAM-based mapping refined via GIMP, and autonomous control using the Nav2 Python API.
+A ROS 2 Humble workspace for simulating and autonomously navigating a **TurtleBot3 Waffle** through a custom hexagonal **Maze** environment using the ROS 2 navigation stack.
 
-🚀 Key Features
+The project demonstrates a full robotics pipeline including **simulation, SLAM mapping and autonomous navigation** using Python APIs.
 
-    Custom Environment: Hexagonal maze designed via Gazebo Building Editor.
+---
 
-    Waffle Configuration: Optimized for the TurtleBot3 Waffle model (Lidar + Camera).
+# Features
 
-    High-Fidelity Mapping: SLAM Toolbox maps refined in GIMP to ensure 100% wall occupancy.
+* **Custom Gazebo Simulation** with a hexagonal Sigma Maze environment
+* **TurtleBot3 Waffle Configuration** with LiDAR and camera sensors
+* **SLAM Mapping** using SLAM Toolbox for 2D LiDAR-based mapping
+* **Autonomous Navigation** using the Nav2 stack
+* **Programmatic Goal Control** via nav2_simple_commander Python API
 
-    Autonomous Navigation: Programmatic goal setting via nav2_simple_commander.
+---
 
-🛠️ Installation & Workspace Setup
+# System Requirements
 
-This project requires the turtlebot3_simulations package to be built from source within a local workspace to allow for custom world modifications.
-1. Create Workspace & Clone Dependencies
-Bash
+* **OS:** Ubuntu 22.04
+* **ROS2:** ROS 2 Humble Hawksbill
+* **Simulation:** Gazebo
 
+---
+
+# Dependencies Installation
+
+## Prerequisites
+
+Install ROS2 Humble if not already installed:
+
+```bash
+sudo apt update
+sudo apt install -y ros-humble-desktop
+```
+
+Initialize rosdep:
+
+```bash
+sudo rosdep init
+rosdep update
+```
+
+---
+
+# Workspace Setup
+
+Create a ROS2 workspace and clone the required repositories.
+
+```bash
 mkdir -p ~/turtlebot3_ws/src
 cd ~/turtlebot3_ws/src
+```
 
-# Clone the official simulation package
+Clone TurtleBot3 simulation packages:
+
+```bash
 git clone -b humble https://github.com/ROBOTIS-GIT/turtlebot3_simulations.git
+```
 
-# Clone this navigation project
+Clone this repository:
+
+```bash
 git clone https://github.com/morshed-asif/turtlebot3_maze_navigator.git
+```
 
-2. Build and Source
-Bash
+---
+
+# Build Instructions
+
+Build the workspace:
+
+```bash
 cd ~/turtlebot3_ws
 colcon build --symlink-install
+```
 
-# Add to your .bashrc for automatic sourcing
+Source the workspace:
+
+```bash
+source install/setup.bash
+```
+
+Add to `.bashrc` for automatic sourcing:
+
+```bash
 echo "source ~/turtlebot3_ws/install/setup.bash" >> ~/.bashrc
-source ~/.bashrc
+```
 
-🕹️ How to Run
-1. Launch Simulation
+---
 
-Ensure the model is set to Waffle:
-Bash
+# Launch Commands
 
+## Basic Simulation
+
+Set the TurtleBot3 model:
+
+```bash
 export TURTLEBOT3_MODEL=waffle
+```
+
+Launch the custom maze environment:
+
+```bash
 ros2 launch turtlebot3_gazebo turtlebot3_my_maze.launch.py
+```
 
-2. Launch Navigation
-Bash
+---
 
+# Navigation
+
+Launch the navigation stack with the generated map:
+
+```bash
 ros2 launch turtlebot3_navigation2 navigation2.launch.py \
-  use_sim_time:=True \
-  map:=~/turtlebot3_maze_navigator/maps/sigma_maze.yaml
+use_sim_time:=True \
+map:=~/turtlebot3_maze_navigator/maps/sigma_maze.yaml
+```
 
-3. Run Mission Script
-Bash
+This launches:
 
+* Nav2 planner
+* Local and global costmaps
+* AMCL localization
+* Behavior tree navigation
+
+---
+
+# Autonomous Mission Script
+
+Run the Python navigation script:
+
+```bash
 python3 ~/turtlebot3_maze_navigator/nav2_commander_api.py
+```
 
-📂 Repository Structure
+The script sends navigation goals programmatically using the **BasicNavigator API**.
 
-    maps/: GIMP-refined .yaml and .pgm occupancy grids.
+---
 
-    src/: Custom launch files and Gazebo world descriptions.
+# Repository Structure
 
-    nav2_commander_api.py: Python navigation logic using BasicNavigator.
-    
-Author
-Asif Morshed
+```
+turtlebot3_maze_navigator
+│
+├── maps
+│   ├── sigma_maze.yaml
+│   └── sigma_maze.pgm
+│
+├── src
+│   ├── launch
+│   └── worlds
+│
+├── nav2_commander_api.py
+└── README.md
+```
+
+### Package Description
+
+| Component             | Description                                                 |
+| --------------------- | ----------------------------------------------------------- |
+| maps                  | Occupancy grid maps generated from SLAM and refined in GIMP |
+| src                   | Custom Gazebo world files and launch configurations         |
+| nav2_commander_api.py | Python navigation controller using Nav2 API                 |
+
+---
+
+# Navigation Topics
+
+## Robot Control
+
+| Topic        | Type        | Description             |
+| ------------ | ----------- | ----------------------- |
+| `/cmd_vel`   | Twist       | Velocity commands       |
+| `/goal_pose` | PoseStamped | Navigation goal         |
+| `/plan`      | Path        | Planned navigation path |
+
+## Sensor Data
+
+| Topic   | Type      | Description     |
+| ------- | --------- | --------------- |
+| `/scan` | LaserScan | LiDAR scan data |
+| `/odom` | Odometry  | Wheel odometry  |
+
+## Mapping
+
+| Topic  | Type          | Description        |
+| ------ | ------------- | ------------------ |
+| `/map` | OccupancyGrid | Generated SLAM map |
+
+---
+
+# Mapping Workflow
+
+1. Launch the simulation environment
+2. Run SLAM Toolbox to generate the map
+3. Refine the map in GIMP for clean walls
+4. Use the refined map for AMCL navigation
+
+---
+
+# Author
+
+**Asif Morshed**
+
+GitHub:
+[https://github.com/morshed-asif](https://github.com/morshed-asif)
+
+---
